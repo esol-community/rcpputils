@@ -129,7 +129,7 @@ bool CpuSet::is_set(std::size_t cpu) const
 std::size_t CpuSet::count() const
 {
   if (cpu_set_) {
-    return CPU_COUNT_S(num_processors(), cpu_set_.get());
+    return CPU_COUNT_S(alloc_size(), cpu_set_.get());
   } else {
     return 0;
   }
