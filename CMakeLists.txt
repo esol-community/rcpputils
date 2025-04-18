@@ -10,6 +10,7 @@ find_package(rcutils REQUIRED)
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 11)
 endif()
+# TODO (ahcorde): Remove tl_expected when CXX 20 standard is available
 # Default to C++17
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 17)
@@ -25,9 +26,10 @@ endif()
 
 add_library(${PROJECT_NAME}
   src/asserts.cpp
+  src/env.cpp
   src/filesystem_helper.cpp
   src/find_library.cpp
-  src/env.cpp
+  src/process.cpp
   src/shared_library.cpp)
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -43,7 +45,7 @@ if(WIN32)
   target_compile_definitions(${PROJECT_NAME}
     PRIVATE "RCPPUTILS_BUILDING_LIBRARY")
 endif()
-ament_target_dependencies(${PROJECT_NAME} rcutils)
+target_link_libraries(${PROJECT_NAME} PUBLIC rcutils::rcutils)
 
 # Export old-style CMake variables
 ament_export_include_directories("include/${PROJECT_NAME}")
@@ -56,13 +58,39 @@ ament_export_dependencies(rcutils)
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
-  find_package(ament_lint_auto REQUIRED)
+
+  find_package(ament_cmake_copyright REQUIRED)
+  find_package(ament_cmake_cppcheck REQUIRED)
+  find_package(ament_cmake_cpplint REQUIRED)
+  find_package(ament_cmake_flake8 REQUIRED)
+  find_package(ament_cmake_lint_cmake REQUIRED)
+  find_package(ament_cmake_pep257 REQUIRED)
+  find_package(ament_cmake_uncrustify REQUIRED)
+  find_package(ament_cmake_xmllint REQUIRED)
+
+  set(
+    _linter_excludes
+    include/rcpputils/tl_expected/expected.hpp
+  )
+
+  ament_copyright(EXCLUDE ${_linter_excludes})
+  ament_cppcheck(
+    EXCLUDE ${_linter_excludes}
+    LANGUAGE c++
+  )
+  ament_cpplint(EXCLUDE ${_linter_excludes})
+  ament_flake8(EXCLUDE ${_linter_excludes})
+  ament_lint_cmake()
+  ament_pep257(EXCLUDE ${_linter_excludes})
+  ament_uncrustify(
+    EXCLUDE ${_linter_excludes}
+    LANGUAGE c++
+  )
+  ament_xmllint()
 
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wthread-safety -Werror)
   endif()
-
-  ament_lint_auto_find_test_dependencies()
 
   ament_add_gtest(test_asserts_ndebug test/test_asserts.cpp)
   target_link_libraries(test_asserts_ndebug ${PROJECT_NAME})
@@ -81,15 +109,13 @@ if(BUILD_TESTING)
   target_link_libraries(test_join ${PROJECT_NAME})
 
   ament_add_gtest(test_time test/test_time.cpp)
-  target_link_libraries(test_time ${PROJECT_NAME})
-  ament_target_dependencies(test_time rcutils)
+  target_link_libraries(test_time ${PROJECT_NAME} rcutils::rcutils)
 
   ament_add_gtest(test_env test/test_env.cpp
     ENV
       EMPTY_TEST=
       NORMAL_TEST=foo
   )
-  ament_target_dependencies(test_env rcutils)
   target_link_libraries(test_env ${PROJECT_NAME})
 
   ament_add_gtest(test_scope_exit test/test_scope_exit.cpp)
@@ -102,7 +128,6 @@ if(BUILD_TESTING)
     ENV
       EXPECTED_WORKING_DIRECTORY=$<SHELL_PATH:${CMAKE_CURRENT_BINARY_DIR}>
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-  ament_target_dependencies(test_filesystem_helper rcutils)
   target_link_libraries(test_filesystem_helper ${PROJECT_NAME})
 
   ament_add_gtest(test_find_and_replace test/test_find_and_replace.cpp)
@@ -113,7 +138,6 @@ if(BUILD_TESTING)
 
   ament_add_gtest(test_process test/test_process.cpp)
   target_link_libraries(test_process ${PROJECT_NAME})
-  ament_target_dependencies(test_process rcutils)
 
   set(append_library_dirs "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
 
@@ -136,8 +160,9 @@ if(BUILD_TESTING)
 
   add_library(test_library SHARED test/test_library.cpp)
   target_link_libraries(test_library PUBLIC ${PROJECT_NAME})
+
   ament_add_gtest(test_find_library test/test_find_library.cpp)
-  target_link_libraries(test_find_library test_library)
+  target_link_libraries(test_find_library test_library rcutils::rcutils)
   set_tests_properties(test_find_library PROPERTIES
     ENVIRONMENT
       "_TEST_LIBRARY_DIR=$<TARGET_FILE_DIR:test_library>;_TEST_LIBRARY=$<TARGET_FILE:test_library>")
@@ -150,6 +175,9 @@ if(BUILD_TESTING)
 
   ament_add_gtest(test_thread test/test_thread.cpp)
   target_link_libraries(test_thread ${PROJECT_NAME})
+
+  ament_add_gtest(test_unique_lock test/test_unique_lock.cpp)
+  target_link_libraries(test_unique_lock ${PROJECT_NAME})
 endif()
 
 ament_package()
@@ -163,3 +191,4 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
+ament_generate_version_header(${PROJECT_NAME})

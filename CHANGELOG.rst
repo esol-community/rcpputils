@@ -2,6 +2,32 @@
 Changelog for package rcpputils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.11.0 (2024-04-16)
+-------------------
+* Generate version header with ament_generate_version_header function (`#190 <https://github.com/ros2/rcpputils/issues/190>`_)
+* Update docs for rcpputils::split functions (`#188 <https://github.com/ros2/rcpputils/issues/188>`_)
+* Contributors: Christophe Bedard, Sai Kishor Kothakota
+
+2.10.0 (2024-02-07)
+-------------------
+* Included tl_expected (`#185 <https://github.com/ros2/rcpputils/issues/185>`_)
+* Contributors: Alejandro Hernández Cordero
+
+2.9.0 (2023-12-26)
+------------------
+* Switch to using target_link_libraries. (`#183 <https://github.com/ros2/rcpputils/issues/183>`_)
+* Contributors: Chris Lalancette
+
+2.8.1 (2023-11-06)
+------------------
+* Add a missing header due to missing PATH_MAX variable (`#181 <https://github.com/ros2/rcpputils/issues/181>`_)
+* Contributors: wojciechmadry
+
+2.8.0 (2023-09-07)
+------------------
+* Add unique_lock implementation with clang thread safety annotations (`#180 <https://github.com/ros2/rcpputils/issues/180>`_)
+* Contributors: Emerson Knapp
+
 2.7.1 (2023-05-11)
 ------------------
 * Add in a missing cstdint. (`#178 <https://github.com/ros2/rcpputils/issues/178>`_)
