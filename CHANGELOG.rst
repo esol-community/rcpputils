@@ -2,6 +2,33 @@
 Changelog for package rcpputils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.14.3 (2025-09-17)
+-------------------
+* Remove unnecessary dependencies from rcpputils. (`#216 <https://github.com/ros2/rcpputils/issues/216>`_)
+  It doesn't need to have dependencies on python tests.
+* Contributors: Chris Lalancette
+
+2.14.2 (2025-07-01)
+-------------------
+* fix cmake deprecation (`#214 <https://github.com/ros2/rcpputils/issues/214>`_)
+* Contributors: mosfet80
+
+2.14.1 (2025-06-19)
+-------------------
+* add thread naming utilities (`#213 <https://github.com/ros2/rcpputils/issues/213>`_)
+* Removed deprecated path (`#212 <https://github.com/ros2/rcpputils/issues/212>`_)
+* Contributors: Adam Aposhian, Alejandro Hernández Cordero
+
+2.14.0 (2025-04-24)
+-------------------
+
+2.13.4 (2025-04-18)
+-------------------
+* Switch to ament_cmake_ros_core package (`#211 <https://github.com/ros2/rcpputils/issues/211>`_)
+* Added marco to disable deprecation warnings (`#210 <https://github.com/ros2/rcpputils/issues/210>`_)
+* Added missing include (`#207 <https://github.com/ros2/rcpputils/issues/207>`_)
+* Contributors: Alejandro Hernández Cordero, Janosch Machowinski, Michael Carroll
+
 2.13.3 (2025-02-02)
 -------------------
 * Clear the rcutils error when throwing an exception. (`#206 <https://github.com/ros2/rcpputils/issues/206>`_)

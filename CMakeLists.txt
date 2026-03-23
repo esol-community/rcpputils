@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 
 project(rcpputils)
 
@@ -30,7 +30,8 @@ add_library(${PROJECT_NAME}
   src/filesystem_helper.cpp
   src/find_library.cpp
   src/process.cpp
-  src/shared_library.cpp)
+  src/shared_library.cpp
+  src/thread_name.cpp)
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
@@ -57,14 +58,11 @@ ament_export_targets(${PROJECT_NAME})
 ament_export_dependencies(rcutils)
 
 if(BUILD_TESTING)
-  find_package(ament_cmake_gtest REQUIRED)
-
   find_package(ament_cmake_copyright REQUIRED)
   find_package(ament_cmake_cppcheck REQUIRED)
   find_package(ament_cmake_cpplint REQUIRED)
-  find_package(ament_cmake_flake8 REQUIRED)
+  find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_cmake_lint_cmake REQUIRED)
-  find_package(ament_cmake_pep257 REQUIRED)
   find_package(ament_cmake_uncrustify REQUIRED)
   find_package(ament_cmake_xmllint REQUIRED)
 
@@ -79,9 +77,7 @@ if(BUILD_TESTING)
     LANGUAGE c++
   )
   ament_cpplint(EXCLUDE ${_linter_excludes})
-  ament_flake8(EXCLUDE ${_linter_excludes})
   ament_lint_cmake()
-  ament_pep257(EXCLUDE ${_linter_excludes})
   ament_uncrustify(
     EXCLUDE ${_linter_excludes}
     LANGUAGE c++
@@ -89,7 +85,7 @@ if(BUILD_TESTING)
   ament_xmllint()
 
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-Wthread-safety -Werror)
+    add_compile_options(-Wthread-safety)
   endif()
 
   ament_add_gtest(test_asserts_ndebug test/test_asserts.cpp)
@@ -101,6 +97,9 @@ if(BUILD_TESTING)
 
   ament_add_gtest(test_asserts_debug test/test_asserts.cpp)
   target_link_libraries(test_asserts_debug ${PROJECT_NAME})
+
+  ament_add_gtest(test_thread_name test/test_thread_name.cpp)
+  target_link_libraries(test_thread_name ${PROJECT_NAME})
 
   ament_add_gtest(test_thread_safety_annotations test/test_thread_safety_annotations.cpp)
   target_link_libraries(test_thread_safety_annotations ${PROJECT_NAME})
